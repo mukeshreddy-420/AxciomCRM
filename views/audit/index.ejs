@@ -1,0 +1,72 @@
+<h2><i class="bi bi-shield-check"></i> Audit Log</h2>
+
+<form class="row g-2 mb-3" method="GET" action="/audit">
+  <div class="col-md-2">
+    <input type="text" name="action" class="form-control" placeholder="Action..." value="<%= filters.action %>">
+  </div>
+  <div class="col-md-2">
+    <select name="entity" class="form-select">
+      <option value="">All Entities</option>
+      <% entities.forEach(e => { %>
+        <option value="<%= e %>" <%= filters.entity===e?'selected':'' %>><%= e %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="userId" class="form-select">
+      <option value="">All Users</option>
+      <% users.forEach(u => { %>
+        <option value="<%= u.UserId %>" <%= String(filters.userId)===String(u.UserId)?'selected':'' %>><%= u.FullName %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <input type="date" name="dateFrom" class="form-control" value="<%= filters.dateFrom %>" placeholder="From">
+  </div>
+  <div class="col-md-2">
+    <input type="date" name="dateTo" class="form-control" value="<%= filters.dateTo %>" placeholder="To">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-primary w-100"><i class="bi bi-search"></i> Filter</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th><th>Date</th><th>User</th><th>Action</th><th>Entity</th><th>Record</th><th>IP</th><th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (logs.length === 0) { %>
+        <tr><td colspan="8" class="text-center text-muted">No audit records.</td></tr>
+      <% } %>
+      <% logs.forEach(l => { %>
+        <tr>
+          <td><%= l.AuditLogId %></td>
+          <td><small><%= l.CreatedDate %></small></td>
+          <td><%= l.FullName || 'System' %></td>
+          <td><span class="badge bg-<%= l.Action.includes('FAIL')||l.Action.includes('LOCKED')?'danger':(l.Action.includes('DELETE')?'warning':'info') %>"><%= l.Action %></span></td>
+          <td><%= l.EntityName %></td>
+          <td><%= l.RecordId || '-' %></td>
+          <td><small><%= l.IpAddress || '-' %></small></td>
+          <td>
+            <% if (l.NewValue) { %>
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailModal<%= l.AuditLogId %>">View</button>
+              <div class="modal fade" id="detailModal<%= l.AuditLogId %>" tabindex="-1">
+                <div class="modal-dialog"><div class="modal-content">
+                  <div class="modal-header"><h5>Audit Detail #<%= l.AuditLogId %></h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                  <div class="modal-body">
+                    <% if (l.OldValue) { %><p><strong>Old:</strong><pre><%= l.OldValue %></pre></p><% } %>
+                    <p><strong>New:</strong><pre><%= l.NewValue %></pre></p>
+                  </div>
+                </div></div>
+              </div>
+            <% } else { %> - <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

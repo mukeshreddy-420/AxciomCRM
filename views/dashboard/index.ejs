@@ -1,0 +1,126 @@
+<h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+<p class="text-muted">Welcome, <strong><%= user.name %></strong> (<%= user.role %>)</p>
+<hr>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-primary text-white">
+      <div class="card-body text-center">
+        <h5>Total Customers</h5>
+        <h2><%= stats.totalCustomers %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-info text-white">
+      <div class="card-body text-center">
+        <h5>Total Leads</h5>
+        <h2><%= stats.totalLeads %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-warning text-dark">
+      <div class="card-body text-center">
+        <h5>Open Leads</h5>
+        <h2><%= stats.openLeads %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-secondary text-white">
+      <div class="card-body text-center">
+        <h5>Total Opportunities</h5>
+        <h2><%= stats.totalOpportunities %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-success text-white">
+      <div class="card-body text-center">
+        <h5>Open Opportunities</h5>
+        <h2><%= stats.openOpportunities %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-success text-white">
+      <div class="card-body text-center">
+        <h5>Won Opportunities</h5>
+        <h2><%= stats.wonOpportunities %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-danger text-white">
+      <div class="card-body text-center">
+        <h5>Lost Opportunities</h5>
+        <h2><%= stats.lostOpportunities %></h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard bg-dark text-white">
+      <div class="card-body text-center">
+        <h5>Pipeline Value</h5>
+        <h2>$<%= stats.pipelineValue.toLocaleString() %></h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Lead Status Distribution</div>
+      <div class="card-body"><canvas id="leadChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Opportunity Pipeline</div>
+      <div class="card-body"><canvas id="oppChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Monthly Sales (Won)</div>
+      <div class="card-body"><canvas id="salesChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const leadData = <%- JSON.stringify(charts.leadStatus) %>;
+  new Chart(document.getElementById('leadChart'), {
+    type: 'doughnut',
+    data: {
+      labels: leadData.map(d => d.status),
+      datasets: [{ data: leadData.map(d => d.count),
+        backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107','#6c757d'] }]
+    }
+  });
+
+  const oppData = <%- JSON.stringify(charts.oppPipeline) %>;
+  new Chart(document.getElementById('oppChart'), {
+    type: 'bar',
+    data: {
+      labels: oppData.map(d => d.stage),
+      datasets: [{ label: 'Count', data: oppData.map(d => d.count),
+        backgroundColor: ['#0d6efd','#6610f2','#fd7e14','#198754','#dc3545'] }]
+    },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  const salesData = <%- JSON.stringify(charts.monthlySales) %>;
+  new Chart(document.getElementById('salesChart'), {
+    type: 'line',
+    data: {
+      labels: salesData.map(d => d.month),
+      datasets: [{ label: 'Won Amount', data: salesData.map(d => d.total),
+        borderColor: '#198754', fill: true, backgroundColor: 'rgba(25,135,84,0.1)' }]
+    }
+  });
+});
+</script>

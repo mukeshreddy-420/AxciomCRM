@@ -1,0 +1,70 @@
+<h2><i class="bi bi-graph-up-arrow"></i> <%= title %></h2>
+<a href="/opportunities" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+
+<% if (errors.length > 0) { %>
+  <div class="alert alert-danger">
+    <ul class="mb-0"><% errors.forEach(e => { %><li><%= e.msg %></li><% }); %></ul>
+  </div>
+<% } %>
+
+<form method="POST" action="/opportunities/<%= opp.OpportunityId ? 'edit/' + opp.OpportunityId : 'create' %>" id="oppForm">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Opportunity Name *</label>
+      <input type="text" name="OpportunityName" class="form-control" value="<%= opp.OpportunityName || '' %>" required
+        data-validate="required,maxlength:150" data-label="Opportunity Name" maxlength="150">
+      <div class="validation-error" id="OpportunityName-error"></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Customer</label>
+      <select name="CustomerId" class="form-select">
+        <option value="">-- None --</option>
+        <% customers.forEach(c => { %>
+          <option value="<%= c.CustomerId %>" <%= String(opp.CustomerId)===String(c.CustomerId)?'selected':'' %>><%= c.CustomerName %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label class="form-label">Amount *</label>
+      <input type="number" name="Amount" class="form-control" value="<%= opp.Amount || '' %>" required step="0.01" min="0.01"
+        data-validate="required,positive" data-label="Amount">
+      <div class="validation-error" id="Amount-error"></div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label class="form-label">Probability (0-100) *</label>
+      <input type="number" name="Probability" class="form-control" value="<%= opp.Probability != null ? opp.Probability : '' %>" required min="0" max="100"
+        data-validate="required,probability" data-label="Probability">
+      <div class="validation-error" id="Probability-error"></div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label class="form-label">Expected Close Date *</label>
+      <input type="date" name="ExpectedCloseDate" class="form-control" value="<%= opp.ExpectedCloseDate || '' %>" required
+        data-validate="required,futuredate" data-label="Expected Close Date">
+      <div class="validation-error" id="ExpectedCloseDate-error"></div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label class="form-label">Stage *</label>
+      <select name="Stage" class="form-select" required>
+        <% STAGES.forEach(s => { %>
+          <option value="<%= s %>" <%= (opp.Stage||'Qualification')===s?'selected':'' %>><%= s %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Assigned To *</label>
+      <select name="AssignedTo" class="form-select" required>
+        <option value="">-- Select --</option>
+        <% users.forEach(u => { %>
+          <option value="<%= u.UserId %>" <%= String(opp.AssignedTo)===String(u.UserId)?'selected':'' %>><%= u.FullName %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-12 mb-3">
+      <label class="form-label">Notes</label>
+      <textarea name="Notes" class="form-control" rows="3"><%= opp.Notes || '' %></textarea>
+    </div>
+  </div>
+  <button class="btn btn-success"><i class="bi bi-check-lg"></i> Save</button>
+</form>
+<script>document.addEventListener('DOMContentLoaded', function(){ validateForm('oppForm'); });</script>

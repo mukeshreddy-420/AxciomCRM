@@ -1,0 +1,64 @@
+<h2><i class="bi bi-funnel"></i> Leads</h2>
+<a href="/leads/create" class="btn btn-primary mb-3"><i class="bi bi-plus-circle"></i> New Lead</a>
+
+<form class="row g-2 mb-3" method="GET" action="/leads">
+  <div class="col-md-3">
+    <input type="text" name="search" class="form-control" placeholder="Search name, company, email..." value="<%= search %>">
+  </div>
+  <div class="col-md-2">
+    <select name="status" class="form-select">
+      <option value="">All Status</option>
+      <% VALID_STATUSES.forEach(s => { %>
+        <option value="<%= s %>" <%= status===s?'selected':'' %>><%= s %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Code</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Source</th><th>Status</th><th>Assigned To</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (leads.length === 0) { %>
+        <tr><td colspan="9" class="text-center text-muted">No leads found.</td></tr>
+      <% } %>
+      <% leads.forEach(l => { %>
+        <tr>
+          <td><%= l.LeadCode %></td>
+          <td><%= l.LeadName %></td>
+          <td><%= l.Email %></td>
+          <td><%= l.Phone %></td>
+          <td><%= l.CompanyName || '-' %></td>
+          <td><%= l.Source %></td>
+          <td>
+            <% const statusColors = {New:'primary',Contacted:'info',Qualified:'success',Unqualified:'warning',Converted:'dark',Lost:'danger'}; %>
+            <span class="badge bg-<%= statusColors[l.Status]||'secondary' %>"><%= l.Status %></span>
+          </td>
+          <td><%= l.AssignedName || '-' %></td>
+          <td>
+            <a href="/leads/edit/<%= l.LeadId %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+            <% if (l.Status === 'Qualified') { %>
+              <form method="POST" action="/leads/convert/<%= l.LeadId %>" class="d-inline"
+                onsubmit="return confirm('Convert this lead to Customer + Opportunity?')">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-sm btn-outline-success" title="Convert"><i class="bi bi-arrow-repeat"></i></button>
+              </form>
+            <% } %>
+            <form method="POST" action="/leads/delete/<%= l.LeadId %>" class="d-inline"
+              onsubmit="return confirm('Delete this lead?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

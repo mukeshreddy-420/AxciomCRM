@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>AcxiomCRM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    main { flex: 1; }
+    .sidebar { min-height: calc(100vh - 56px); }
+    .card-dashboard { transition: transform .15s; }
+    .card-dashboard:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);}
+    .validation-error { color: #dc3545; font-size: 0.875em; }
+  </style>
+</head>
+<body>
+  <% if (typeof user !== 'undefined' && user) { %>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/dashboard"><i class="bi bi-building"></i> AcxiomCRM</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/customers"><i class="bi bi-people"></i> Customers</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/leads"><i class="bi bi-funnel"></i> Leads</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/opportunities"><i class="bi bi-graph-up-arrow"></i> Opportunities</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/followups"><i class="bi bi-calendar-check"></i> Follow-Ups</a>
+          </li>
+          <% if (user.role === 'Admin' || user.role === 'Manager') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/reports/pipeline"><i class="bi bi-bar-chart"></i> Pipeline Report</a>
+          </li>
+          <% } %>
+          <% if (user.role === 'Admin') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/users"><i class="bi bi-people-fill"></i> Users</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/audit"><i class="bi bi-shield-check"></i> Audit Log</a>
+          </li>
+          <% } %>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> <%= user.name %> (<%= user.role %>)
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/auth/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <% } %>
+
+  <main class="container-fluid py-3">
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success alert-dismissible fade show"><%= success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error && typeof csrfToken === 'undefined') { %>
+      <div class="alert alert-danger alert-dismissible fade show"><%= error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    <%- body %>
+  </main>
+
+  <footer class="bg-dark text-white text-center py-2 mt-auto">
+    <small>&copy; 2026 AcxiomCRM. All rights reserved.</small>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    // Client-side validation helper
+    function validateForm(formId) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      form.addEventListener('submit', function(e) {
+        let valid = true;
+        form.querySelectorAll('[data-validate]').forEach(function(input) {
+          const rules = input.dataset.validate.split(',');
+          const errorEl = document.getElementById(input.name + '-error');
+          if (errorEl) errorEl.textContent = '';
+          let msg = '';
+          rules.forEach(function(rule) {
+            if (msg) return;
+            const val = input.value.trim();
+            if (rule === 'required' && !val) msg = input.dataset.label + ' is required';
+            if (rule === 'email' && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) msg = 'Enter a valid email address';
+            if (rule === 'phone' && val && !/^\d{10}$/.test(val)) msg = 'Enter a valid 10-digit phone number';
+            if (rule.startsWith('maxlength:')) {
+              const max = parseInt(rule.split(':')[1]);
+              if (val.length > max) msg = input.dataset.label + ' must be at most ' + max + ' characters';
+            }
+            if (rule === 'positive' && val && (isNaN(val) || parseFloat(val) <= 0)) msg = 'Amount must be greater than 0';
+            if (rule === 'probability' && val && (isNaN(val) || parseFloat(val) < 0 || parseFloat(val) > 100)) msg = 'Probability must be between 0 and 100';
+            if (rule === 'futuredate' && val) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              if (new Date(val) < today) msg = 'Date cannot be in the past';
+            }
+            if (rule === 'password' && val && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(val))
+              msg = 'Password: min 8 chars, uppercase, lowercase, digit';
+          });
+          if (msg) {
+            valid = false;
+            if (errorEl) errorEl.textContent = msg;
+            input.classList.add('is-invalid');
+          } else {
+            input.classList.remove('is-invalid');
+          }
+        });
+        if (!valid) e.preventDefault();
+      });
+    }
+  </script>
+</body>
+</html>

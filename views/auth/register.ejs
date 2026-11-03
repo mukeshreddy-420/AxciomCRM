@@ -1,0 +1,44 @@
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4"><i class="bi bi-person-plus"></i> Register</h3>
+        <% if (errors.length > 0) { %>
+          <div class="alert alert-danger">
+            <ul class="mb-0"><% errors.forEach(e => { %><li><%= e.msg %></li><% }); %></ul>
+          </div>
+        <% } %>
+        <form method="POST" action="/auth/register" id="registerForm">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="fullName" class="form-control" value="<%= old.fullName || '' %>" required
+              data-validate="required,maxlength:100" data-label="Full Name">
+            <div class="validation-error" id="fullName-error"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="<%= old.email || '' %>" required
+              data-validate="required,email" data-label="Email">
+            <div class="validation-error" id="email-error"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required
+              data-validate="required,password" data-label="Password">
+            <div class="validation-error" id="password-error"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" name="confirmPassword" class="form-control" required
+              data-validate="required" data-label="Confirm Password">
+            <div class="validation-error" id="confirmPassword-error"></div>
+          </div>
+          <button class="btn btn-success w-100">Register</button>
+        </form>
+        <p class="text-center mt-3">Already have an account? <a href="/auth/login">Login</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>document.addEventListener('DOMContentLoaded', function(){ validateForm('registerForm'); });</script>

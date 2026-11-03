@@ -1,0 +1,75 @@
+<h2><i class="bi bi-calendar-check"></i> <%= title %></h2>
+<a href="/followups" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+
+<% if (errors.length > 0) { %>
+  <div class="alert alert-danger">
+    <ul class="mb-0"><% errors.forEach(e => { %><li><%= e.msg %></li><% }); %></ul>
+  </div>
+<% } %>
+
+<form method="POST" action="/followups/<%= followup.FollowUpId ? 'edit/' + followup.FollowUpId : 'create' %>" id="followupForm">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Subject *</label>
+      <input type="text" name="Subject" class="form-control" value="<%= followup.Subject || '' %>" required
+        data-validate="required,maxlength:200" data-label="Subject" maxlength="200">
+      <div class="validation-error" id="Subject-error"></div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label class="form-label">Follow-Up Date *</label>
+      <input type="date" name="FollowUpDate" class="form-control" value="<%= followup.FollowUpDate || '' %>" required
+        data-validate="required,futuredate" data-label="Follow-Up Date">
+      <div class="validation-error" id="FollowUpDate-error"></div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <label class="form-label">Type *</label>
+      <select name="FollowUpType" class="form-select" required>
+        <% FOLLOWUP_TYPES.forEach(t => { %>
+          <option value="<%= t %>" <%= (followup.FollowUpType||'Call')===t?'selected':'' %>><%= t %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Customer</label>
+      <select name="CustomerId" class="form-select">
+        <option value="">-- None --</option>
+        <% customers.forEach(c => { %>
+          <option value="<%= c.CustomerId %>" <%= String(followup.CustomerId)===String(c.CustomerId)?'selected':'' %>><%= c.CustomerName %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Lead</label>
+      <select name="LeadId" class="form-select">
+        <option value="">-- None --</option>
+        <% leads.forEach(l => { %>
+          <option value="<%= l.LeadId %>" <%= String(followup.LeadId)===String(l.LeadId)?'selected':'' %>><%= l.LeadName %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Assigned To *</label>
+      <select name="AssignedTo" class="form-select" required>
+        <option value="">-- Select --</option>
+        <% users.forEach(u => { %>
+          <option value="<%= u.UserId %>" <%= String(followup.AssignedTo)===String(u.UserId)?'selected':'' %>><%= u.FullName %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Status</label>
+      <select name="Status" class="form-select">
+        <% FOLLOWUP_STATUSES.forEach(s => { %>
+          <option value="<%= s %>" <%= (followup.Status||'Planned')===s?'selected':'' %>><%= s %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-12 mb-3">
+      <label class="form-label">Remarks</label>
+      <textarea name="Remarks" class="form-control" rows="3"><%= followup.Remarks || '' %></textarea>
+    </div>
+  </div>
+  <button class="btn btn-success"><i class="bi bi-check-lg"></i> Save</button>
+</form>
+<script>document.addEventListener('DOMContentLoaded', function(){ validateForm('followupForm'); });</script>
