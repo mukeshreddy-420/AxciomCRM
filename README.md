@@ -102,3 +102,5 @@ node acceptance_test.js
 12. Creating, updating, deleting records writes entries into `AuditLog`.
 13. `GET /api/customers` returns authorized JSON without exposing password hashes.
 14. Dashboard displays all 8 KPI cards and 3 Chart.js graphs rendered from server data.
+
+# AxciomCRM
