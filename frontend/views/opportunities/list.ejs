@@ -1,0 +1,56 @@
+<h2><i class="bi bi-graph-up-arrow"></i> Opportunities</h2>
+<a href="/opportunities/create" class="btn btn-primary mb-3"><i class="bi bi-plus-circle"></i> New Opportunity</a>
+
+<form class="row g-2 mb-3" method="GET" action="/opportunities">
+  <div class="col-md-3">
+    <input type="text" name="search" class="form-control" placeholder="Search name, customer..." value="<%= search %>">
+  </div>
+  <div class="col-md-2">
+    <select name="stage" class="form-select">
+      <option value="">All Stages</option>
+      <% STAGES.forEach(s => { %>
+        <option value="<%= s %>" <%= stage===s?'selected':'' %>><%= s %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th><th>Customer</th><th>Amount</th><th>Stage</th><th>Probability</th><th>Close Date</th><th>Assigned</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (opportunities.length === 0) { %>
+        <tr><td colspan="8" class="text-center text-muted">No opportunities found.</td></tr>
+      <% } %>
+      <% opportunities.forEach(o => { %>
+        <tr>
+          <td><%= o.OpportunityName %></td>
+          <td><%= o.CustomerName || '-' %></td>
+          <td>$<%= Number(o.Amount).toLocaleString() %></td>
+          <td>
+            <% const stageColors = {Qualification:'primary',Proposal:'info',Negotiation:'warning',Won:'success',Lost:'danger'}; %>
+            <span class="badge bg-<%= stageColors[o.Stage]||'secondary' %>"><%= o.Stage %></span>
+          </td>
+          <td><%= o.Probability %>%</td>
+          <td><%= o.ExpectedCloseDate %></td>
+          <td><%= o.AssignedName || '-' %></td>
+          <td>
+            <a href="/opportunities/edit/<%= o.OpportunityId %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+            <form method="POST" action="/opportunities/delete/<%= o.OpportunityId %>" class="d-inline"
+              onsubmit="return confirm('Delete this opportunity?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

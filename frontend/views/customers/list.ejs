@@ -1,0 +1,52 @@
+<h2><i class="bi bi-people"></i> Customers</h2>
+<a href="/customers/create" class="btn btn-primary mb-3"><i class="bi bi-plus-circle"></i> New Customer</a>
+
+<form class="row g-2 mb-3" method="GET" action="/customers">
+  <div class="col-md-4">
+    <input type="text" name="search" class="form-control" placeholder="Search name, email, phone, company..." value="<%= search %>">
+  </div>
+  <div class="col-md-2">
+    <select name="status" class="form-select">
+      <option value="">All Status</option>
+      <option value="Active" <%= status==='Active'?'selected':'' %>>Active</option>
+      <option value="Inactive" <%= status==='Inactive'?'selected':'' %>>Inactive</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-primary"><i class="bi bi-search"></i> Filter</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Code</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>City</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (customers.length === 0) { %>
+        <tr><td colspan="8" class="text-center text-muted">No customers found.</td></tr>
+      <% } %>
+      <% customers.forEach(c => { %>
+        <tr>
+          <td><%= c.CustomerCode %></td>
+          <td><%= c.CustomerName %></td>
+          <td><%= c.Email %></td>
+          <td><%= c.Phone %></td>
+          <td><%= c.CompanyName || '-' %></td>
+          <td><%= c.City || '-' %></td>
+          <td><span class="badge bg-<%= c.Status==='Active'?'success':'secondary' %>"><%= c.Status %></span></td>
+          <td>
+            <a href="/customers/edit/<%= c.CustomerId %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+            <form method="POST" action="/customers/delete/<%= c.CustomerId %>" class="d-inline"
+              onsubmit="return confirm('Delete this customer?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

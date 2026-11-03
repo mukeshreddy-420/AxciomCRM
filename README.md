@@ -4,13 +4,65 @@ A lightweight, robust Customer Relationship Management (CRM) web application bui
 
 ---
 
+## 📁 Project Architecture & Folder Structure
+
+The project is cleanly separated into two distinct folders for maintainability:
+
+```
+Acxiom/
+├── frontend/
+│   ├── public/                 # Static assets served at web root
+│   │   ├── css/
+│   │   │   └── style.css       # Custom CRM styling (card transitions, badges, validation)
+│   │   └── js/
+│   │       └── main.js         # Client-side form validation & UI helpers
+│   └── views/                  # EJS templates and layouts
+│       ├── layouts/main.ejs    # Global master layout with role-aware navbar
+│       ├── auth/               # Login & Register views
+│       ├── customers/          # List & Create/Edit forms
+│       ├── leads/              # List, Form, & Convert views
+│       ├── opportunities/      # List & Form views
+│       ├── followups/          # List & Form views
+│       ├── dashboard/          # KPI cards and Chart.js charts
+│       ├── reports/            # Pipeline analytics report
+│       ├── users/              # Admin User management views
+│       └── error.ejs           # Friendly error pages (403, 404, 500)
+├── backend/
+│   ├── app.js                  # Express application setup and route mounting
+│   ├── db/
+│   │   └── database.js         # SQLite database schema, seeding, and audit logger
+│   ├── middleware/
+│   │   └── auth.js             # Authentication & role-based access control (requireRole)
+│   └── routes/
+│       ├── auth.js             # Register, login, lockout, and logout
+│       ├── customers.js        # Customers CRUD with dual validation
+│       ├── leads.js            # Leads CRUD and conversion workflow
+│       ├── opportunities.js    # Opportunities CRUD with business rules
+│       ├── followups.js        # Follow-ups CRUD with date validation
+│       ├── dashboard.js        # Role-scoped KPI cards and Chart.js metrics
+│       ├── reports.js          # Pipeline reporting for Admin/Manager
+│       ├── users.js            # User management for Admin
+│       ├── audit.js            # Audit log viewer for Admin
+│       └── api.js              # Secure REST API endpoints
+├── acceptance_test.js          # 14-step automated verification suite
+├── package.json
+└── README.md
+```
+
+### Static Asset Configuration
+- Static assets are located in `frontend/public/` and served via `express.static(path.join(__dirname, '..', 'frontend', 'public'))`.
+- Dedicated stylesheet: `/css/style.css`.
+- Dedicated script: `/js/main.js` (provides client-side HTML5/JS validation for required fields, 10-digit phone, email format, numeric ranges, and future dates).
+
+---
+
 ## 🚀 Quick Start & Setup
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18+ recommended)
 - npm (comes with Node.js)
 
-### Installation
+### Installation & Run
 ```bash
 # 1. Install dependencies
 npm install
@@ -18,7 +70,7 @@ npm install
 # 2. Start the application
 npm start
 # or
-node app.js
+node backend/app.js
 ```
 The server will start at `http://localhost:3000`. The SQLite database (`acxiomcrm.db`) and seeded users/roles are automatically initialized on first run.
 
@@ -84,7 +136,7 @@ All API routes are session-authenticated, role-scoped, input-validated, paramete
 
 To run the automated 14-step verification suite:
 ```bash
-node acceptance_test.js
+npm test
 ```
 
 ### Verification Checklist:
@@ -101,6 +153,4 @@ node acceptance_test.js
 11. `Admin` has full access to `/audit` and `/users` management.
 12. Creating, updating, deleting records writes entries into `AuditLog`.
 13. `GET /api/customers` returns authorized JSON without exposing password hashes.
-14. Dashboard displays all 8 KPI cards and 3 Chart.js graphs rendered from server data.
-
-# AxciomCRM
+14. Dashboard displays all 8 Section 17.11 KPI cards and 3 Chart.js graphs rendered from server data.

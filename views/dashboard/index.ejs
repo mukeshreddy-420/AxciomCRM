@@ -1,126 +1,567 @@
-<h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
-<p class="text-muted">Welcome, <strong><%= user.name %></strong> (<%= user.role %>)</p>
-<hr>
+<!-- Dashboard Header Banner -->
+<div class="dashboard-header-banner">
+  <div>
+    <h1 class="dashboard-header-title">
+      <i class="bi bi-speedometer2 me-2"></i> CRM Performance Dashboard
+    </h1>
+    <p class="dashboard-header-subtitle">
+      Welcome back, <strong><%= user.name %></strong> &bull; Role: <span class="badge bg-light text-dark"><%= user.role %></span>
+    </p>
+  </div>
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <div class="insight-pill">
+      <i class="bi bi-graph-up-arrow text-success"></i>
+      <span>Win Rate: <strong><%= stats.winRate %>%</strong></span>
+    </div>
+    <div class="insight-pill">
+      <i class="bi bi-bullseye text-warning"></i>
+      <span>Lead Conversion: <strong><%= stats.conversionRate %>%</strong></span>
+    </div>
+    <div class="dropdown">
+      <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        <i class="bi bi-plus-circle me-1"></i> Quick Action
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+        <li><a class="dropdown-item" href="/leads/create"><i class="bi bi-funnel me-2"></i> New Lead</a></li>
+        <li><a class="dropdown-item" href="/customers/create"><i class="bi bi-people me-2"></i> New Customer</a></li>
+        <li><a class="dropdown-item" href="/opportunities/create"><i class="bi bi-graph-up me-2"></i> New Opportunity</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="/followups/create"><i class="bi bi-calendar-plus me-2"></i> Schedule Follow-Up</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
 
+<!-- Primary KPI Cards (Row 1) -->
+<div class="row g-3 mb-3">
+  <!-- Total Customers -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="metric-card accent-blue">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Total Customers</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-people-fill"></i></div>
+      </div>
+      <div class="metric-value"><%= stats.totalCustomers %></div>
+      <div class="metric-footer">
+        <span class="trend-up"><i class="bi bi-arrow-up-right"></i> Active Accounts</span>
+        <span class="text-muted ms-auto"><a href="/customers" class="text-decoration-none">View all &rarr;</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Leads & Open Leads -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="metric-card accent-cyan">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Total Leads</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-funnel-fill"></i></div>
+      </div>
+      <div class="metric-value"><%= stats.totalLeads %></div>
+      <div class="metric-footer">
+        <span class="badge badge-subtle-info"><strong><%= stats.openLeads %></strong> Open Leads</span>
+        <span class="text-muted ms-auto"><a href="/leads" class="text-decoration-none">Pipeline &rarr;</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Pipeline Value -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="metric-card accent-amber">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Pipeline Value</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-currency-dollar"></i></div>
+      </div>
+      <div class="metric-value">$<%= Number(stats.pipelineValue).toLocaleString() %></div>
+      <div class="metric-footer">
+        <span class="text-muted">In <strong><%= stats.openOpportunities %></strong> Active Deals</span>
+        <span class="text-muted ms-auto"><a href="/opportunities" class="text-decoration-none">Deals &rarr;</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Revenue / Won -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="metric-card accent-green">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Total Revenue (Won)</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-trophy-fill"></i></div>
+      </div>
+      <div class="metric-value">$<%= Number(stats.totalRevenue).toLocaleString() %></div>
+      <div class="metric-footer">
+        <span class="trend-up"><i class="bi bi-check-circle-fill"></i> <%= stats.wonOpportunities %> Closed Won</span>
+        <span class="text-muted ms-auto">Avg: $<%= stats.avgDealSize.toLocaleString() %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Secondary Metric Cards (Row 2) -->
 <div class="row g-3 mb-4">
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-primary text-white">
-      <div class="card-body text-center">
-        <h5>Total Customers</h5>
-        <h2><%= stats.totalCustomers %></h2>
+  <!-- Total Opportunities -->
+  <div class="col-6 col-md-3">
+    <div class="metric-card accent-purple">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Total Opportunities</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-briefcase-fill"></i></div>
+      </div>
+      <div class="metric-value"><%= stats.totalOpportunities %></div>
+      <div class="metric-footer">
+        <span class="text-muted">Open Deals: <strong><%= stats.openOpportunities %></strong></span>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-info text-white">
-      <div class="card-body text-center">
-        <h5>Total Leads</h5>
-        <h2><%= stats.totalLeads %></h2>
+
+  <!-- Won Opportunities -->
+  <div class="col-6 col-md-3">
+    <div class="metric-card accent-green">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Won Opportunities</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-patch-check-fill"></i></div>
+      </div>
+      <div class="metric-value"><%= stats.wonOpportunities %></div>
+      <div class="metric-footer">
+        <span class="trend-up"><i class="bi bi-pie-chart-fill"></i> <%= stats.winRate %>% Win Rate</span>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-warning text-dark">
-      <div class="card-body text-center">
-        <h5>Open Leads</h5>
-        <h2><%= stats.openLeads %></h2>
+
+  <!-- Lost Opportunities -->
+  <div class="col-6 col-md-3">
+    <div class="metric-card accent-red">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Lost Opportunities</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-x-circle-fill"></i></div>
+      </div>
+      <div class="metric-value"><%= stats.lostOpportunities %></div>
+      <div class="metric-footer">
+        <% const closedTotal = stats.wonOpportunities + stats.lostOpportunities; %>
+        <span class="text-muted"><%= closedTotal > 0 ? Math.round((stats.lostOpportunities / closedTotal) * 100) : 0 %>% Loss Ratio</span>
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-secondary text-white">
-      <div class="card-body text-center">
-        <h5>Total Opportunities</h5>
-        <h2><%= stats.totalOpportunities %></h2>
+
+  <!-- Pending Follow-Ups -->
+  <div class="col-6 col-md-3">
+    <div class="metric-card accent-dark">
+      <div class="metric-card-header">
+        <h6 class="metric-title">Pending Follow-Ups</h6>
+        <div class="metric-icon-wrap"><i class="bi bi-calendar-check-fill"></i></div>
       </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-success text-white">
-      <div class="card-body text-center">
-        <h5>Open Opportunities</h5>
-        <h2><%= stats.openOpportunities %></h2>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-success text-white">
-      <div class="card-body text-center">
-        <h5>Won Opportunities</h5>
-        <h2><%= stats.wonOpportunities %></h2>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-danger text-white">
-      <div class="card-body text-center">
-        <h5>Lost Opportunities</h5>
-        <h2><%= stats.lostOpportunities %></h2>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card card-dashboard bg-dark text-white">
-      <div class="card-body text-center">
-        <h5>Pipeline Value</h5>
-        <h2>$<%= stats.pipelineValue.toLocaleString() %></h2>
+      <div class="metric-value"><%= stats.pendingFollowups %></div>
+      <div class="metric-footer">
+        <span class="text-muted"><a href="/followups" class="text-decoration-none">Manage schedule &rarr;</a></span>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Charts Section -->
+<div class="row g-3 mb-4">
+  <!-- Chart 1: Lead Status Distribution (Doughnut) -->
+  <div class="col-lg-4">
+    <div class="content-card h-100">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-pie-chart-fill text-primary"></i> Lead Status Distribution</h6>
+        <span class="badge bg-light text-secondary">Total: <%= stats.totalLeads %></span>
+      </div>
+      <div class="content-card-body">
+        <div class="chart-container">
+          <canvas id="leadChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Opportunity Pipeline Stages (Bar) -->
+  <div class="col-lg-4">
+    <div class="content-card h-100">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-bar-chart-steps text-info"></i> Opportunity Pipeline</h6>
+        <span class="badge bg-light text-secondary"><%= stats.totalOpportunities %> Deals</span>
+      </div>
+      <div class="content-card-body">
+        <div class="chart-container">
+          <canvas id="oppChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Monthly Sales (Line / Area) -->
+  <div class="col-lg-4">
+    <div class="content-card h-100">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-graph-up text-success"></i> Monthly Sales (Won)</h6>
+        <span class="badge bg-light text-success font-monospace">$<%= Number(stats.totalRevenue).toLocaleString() %></span>
+      </div>
+      <div class="content-card-body">
+        <div class="chart-container">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Secondary Analytics & Tables Section -->
+<div class="row g-3 mb-4">
+  <!-- Upcoming Follow-Ups -->
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-clock-history text-warning"></i> Upcoming Follow-Ups</h6>
+        <a href="/followups" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Subject</th>
+              <th>Type</th>
+              <th>Customer / Lead</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (tables.upcomingFollowups.length === 0) { %>
+              <tr><td colspan="5" class="text-center text-muted py-3">No upcoming follow-ups scheduled.</td></tr>
+            <% } %>
+            <% tables.upcomingFollowups.forEach(f => { %>
+              <tr>
+                <td><strong><%= f.FollowUpDate %></strong></td>
+                <td>
+                  <a href="/followups/edit/<%= f.FollowUpId %>" class="text-decoration-none fw-semibold text-dark">
+                    <%= f.Subject %>
+                  </a>
+                </td>
+                <td>
+                  <% const typeIcons = { Call: 'telephone', Meeting: 'people', Email: 'envelope', Task: 'check2-square', Visit: 'geo-alt' }; %>
+                  <span class="badge bg-light text-dark border">
+                    <i class="bi bi-<%= typeIcons[f.FollowUpType] || 'card-text' %> me-1"></i><%= f.FollowUpType %>
+                  </span>
+                </td>
+                <td><%= f.CustomerName || f.LeadName || '-' %></td>
+                <td>
+                  <span class="badge <%= f.Status === 'Completed' ? 'badge-subtle-success' : (f.Status === 'Missed' ? 'badge-subtle-danger' : 'badge-subtle-primary') %>">
+                    <%= f.Status %>
+                  </span>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Leads -->
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-person-lines-fill text-primary"></i> Recent Leads</h6>
+        <a href="/leads" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Lead</th>
+              <th>Company</th>
+              <th>Value</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (tables.recentLeads.length === 0) { %>
+              <tr><td colspan="5" class="text-center text-muted py-3">No leads recorded.</td></tr>
+            <% } %>
+            <% tables.recentLeads.forEach(l => { %>
+              <tr>
+                <td>
+                  <div class="fw-bold"><%= l.LeadName %></div>
+                  <small class="text-muted"><%= l.Email %></small>
+                </td>
+                <td><%= l.CompanyName || '-' %></td>
+                <td class="fw-semibold text-success">$<%= Number(l.ExpectedValue || 0).toLocaleString() %></td>
+                <td>
+                  <% const leadBadges = { New: 'badge-subtle-primary', Contacted: 'badge-subtle-info', Qualified: 'badge-subtle-success', Unqualified: 'badge-subtle-warning', Converted: 'badge-subtle-dark', Lost: 'badge-subtle-danger' }; %>
+                  <span class="badge <%= leadBadges[l.Status] || 'badge-subtle-secondary' %>"><%= l.Status %></span>
+                </td>
+                <td>
+                  <a href="/leads/edit/<%= l.LeadId %>" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Edit"><i class="bi bi-pencil"></i></a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Section: Latest Customers & Recent Activity Audit -->
 <div class="row g-3">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">Lead Status Distribution</div>
-      <div class="card-body"><canvas id="leadChart"></canvas></div>
+  <!-- Latest Customers -->
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-building-check text-info"></i> Latest Customers</h6>
+        <a href="/customers" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Customer Name</th>
+              <th>Company / City</th>
+              <th>Phone</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (tables.latestCustomers.length === 0) { %>
+              <tr><td colspan="5" class="text-center text-muted py-3">No customers found.</td></tr>
+            <% } %>
+            <% tables.latestCustomers.forEach(c => { %>
+              <tr>
+                <td><span class="badge bg-light text-dark border"><%= c.CustomerCode %></span></td>
+                <td>
+                  <a href="/customers/edit/<%= c.CustomerId %>" class="text-decoration-none fw-semibold text-dark">
+                    <%= c.CustomerName %>
+                  </a>
+                </td>
+                <td><%= c.CompanyName || c.City || '-' %></td>
+                <td><small><%= c.Phone %></small></td>
+                <td>
+                  <span class="badge <%= c.Status === 'Active' ? 'badge-subtle-success' : 'badge-subtle-secondary' %>">
+                    <%= c.Status %>
+                  </span>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">Opportunity Pipeline</div>
-      <div class="card-body"><canvas id="oppChart"></canvas></div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">Monthly Sales (Won)</div>
-      <div class="card-body"><canvas id="salesChart"></canvas></div>
+
+  <!-- Recent System & Business Activity -->
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h6 class="content-card-title"><i class="bi bi-shield-check text-dark"></i> Recent Activity Audit</h6>
+        <% if (user.role === 'Admin') { %>
+          <a href="/audit" class="btn btn-sm btn-outline-primary">Audit Log</a>
+        <% } %>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Entity</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (tables.recentActivities.length === 0) { %>
+              <tr><td colspan="4" class="text-center text-muted py-3">No recent activities.</td></tr>
+            <% } %>
+            <% tables.recentActivities.forEach(a => { %>
+              <tr>
+                <td><small class="text-muted"><%= a.CreatedDate %></small></td>
+                <td>
+                  <% const isFail = a.Action.includes('FAIL') || a.Action.includes('LOCKED'); %>
+                  <% const isDel = a.Action.includes('DELETE'); %>
+                  <% const isCreate = a.Action.includes('CREATE') || a.Action.includes('CONVERT'); %>
+                  <span class="badge <%= isFail ? 'badge-subtle-danger' : (isDel ? 'badge-subtle-warning' : (isCreate ? 'badge-subtle-success' : 'badge-subtle-info')) %>">
+                    <%= a.Action %>
+                  </span>
+                </td>
+                <td><strong><%= a.EntityName %></strong></td>
+                <td><small><%= a.FullName || 'System' %></small></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Chart.js Configuration -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Chart Colors Palette
+  const colors = {
+    primary: '#3b82f6',
+    primaryLight: 'rgba(59, 130, 246, 0.15)',
+    success: '#10b981',
+    successLight: 'rgba(16, 185, 129, 0.15)',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    info: '#06b6d4',
+    purple: '#8b5cf6',
+    dark: '#1e293b',
+    slate: '#64748b'
+  };
+
+  // 1. Lead Status Doughnut Chart
   const leadData = <%- JSON.stringify(charts.leadStatus) %>;
-  new Chart(document.getElementById('leadChart'), {
-    type: 'doughnut',
-    data: {
-      labels: leadData.map(d => d.status),
-      datasets: [{ data: leadData.map(d => d.count),
-        backgroundColor: ['#0d6efd','#6610f2','#198754','#dc3545','#ffc107','#6c757d'] }]
-    }
-  });
+  const leadCanvas = document.getElementById('leadChart');
+  if (leadCanvas) {
+    new Chart(leadCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: leadData.map(d => d.status),
+        datasets: [{
+          data: leadData.map(d => d.count),
+          backgroundColor: [
+            colors.primary,
+            colors.info,
+            colors.success,
+            colors.warning,
+            colors.purple,
+            colors.danger
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff',
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, padding: 12, font: { size: 11, family: 'system-ui' } }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                const val = ctx.parsed;
+                const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                return ` ${ctx.label}: ${val} (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
+  // 2. Opportunity Pipeline Bar Chart
   const oppData = <%- JSON.stringify(charts.oppPipeline) %>;
-  new Chart(document.getElementById('oppChart'), {
-    type: 'bar',
-    data: {
-      labels: oppData.map(d => d.stage),
-      datasets: [{ label: 'Count', data: oppData.map(d => d.count),
-        backgroundColor: ['#0d6efd','#6610f2','#fd7e14','#198754','#dc3545'] }]
-    },
-    options: { plugins: { legend: { display: false } } }
-  });
+  const oppCanvas = document.getElementById('oppChart');
+  if (oppCanvas) {
+    new Chart(oppCanvas, {
+      type: 'bar',
+      data: {
+        labels: oppData.map(d => d.stage),
+        datasets: [{
+          label: 'Deals Count',
+          data: oppData.map(d => d.count),
+          backgroundColor: [
+            colors.primary,
+            colors.info,
+            colors.warning,
+            colors.success,
+            colors.danger
+          ],
+          borderRadius: 6,
+          barPercentage: 0.6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              afterLabel: function(ctx) {
+                const item = oppData[ctx.dataIndex];
+                return item && item.amount ? `Volume: $${Number(item.amount).toLocaleString()}` : '';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, font: { size: 11 } },
+            grid: { color: '#f1f5f9' }
+          },
+          x: {
+            ticks: { font: { size: 11 } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
 
+  // 3. Monthly Sales Line / Area Chart
   const salesData = <%- JSON.stringify(charts.monthlySales) %>;
-  new Chart(document.getElementById('salesChart'), {
-    type: 'line',
-    data: {
-      labels: salesData.map(d => d.month),
-      datasets: [{ label: 'Won Amount', data: salesData.map(d => d.total),
-        borderColor: '#198754', fill: true, backgroundColor: 'rgba(25,135,84,0.1)' }]
-    }
-  });
+  const salesCanvas = document.getElementById('salesChart');
+  if (salesCanvas) {
+    new Chart(salesCanvas, {
+      type: 'line',
+      data: {
+        labels: salesData.length ? salesData.map(d => d.month) : ['No Data'],
+        datasets: [{
+          label: 'Won Revenue ($)',
+          data: salesData.length ? salesData.map(d => d.total) : [0],
+          borderColor: colors.success,
+          backgroundColor: colors.successLight,
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: colors.success,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return ` Won Amount: $${Number(ctx.parsed.y).toLocaleString()}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(val) {
+                return '$' + (val >= 1000 ? (val / 1000) + 'k' : val);
+              },
+              font: { size: 11 }
+            },
+            grid: { color: '#f1f5f9' }
+          },
+          x: {
+            ticks: { font: { size: 11 } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
 });
 </script>

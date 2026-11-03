@@ -1,0 +1,61 @@
+<h2><i class="bi bi-people-fill"></i> User & Role Management</h2>
+<p class="text-muted">Manage system users, role assignments, account activation, and lockout status.</p>
+<a href="/users/create" class="btn btn-primary mb-3"><i class="bi bi-person-plus-fill"></i> Add New User</a>
+
+<div class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Lockout Status</th>
+        <th>Created Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(u => { %>
+        <tr>
+          <td><%= u.UserId %></td>
+          <td><strong><%= u.FullName %></strong></td>
+          <td><%= u.Email %></td>
+          <td><span class="badge bg-<%= u.RoleName==='Admin'?'danger':(u.RoleName==='Manager'?'warning text-dark':'primary') %>"><%= u.RoleName %></span></td>
+          <td>
+            <span class="badge bg-<%= u.IsActive ? 'success' : 'secondary' %>">
+              <%= u.IsActive ? 'Active' : 'Inactive' %>
+            </span>
+          </td>
+          <td>
+            <% if (u.LockoutEnd && new Date(u.LockoutEnd) > new Date()) { %>
+              <span class="badge bg-danger">Locked until <%= new Date(u.LockoutEnd).toLocaleTimeString() %></span>
+            <% } else { %>
+              <span class="badge bg-success">Normal (<%= u.FailedLoginCount %> fails)</span>
+            <% } %>
+          </td>
+          <td><small><%= u.CreatedDate %></small></td>
+          <td>
+            <% if (u.UserId !== user.id) { %>
+              <form method="POST" action="/users/toggle-status/<%= u.UserId %>" class="d-inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-sm btn-outline-<%= u.IsActive ? 'warning' : 'success' %>">
+                  <%= u.IsActive ? 'Deactivate' : 'Activate' %>
+                </button>
+              </form>
+              <% if (u.LockoutEnd && new Date(u.LockoutEnd) > new Date()) { %>
+                <form method="POST" action="/users/unlock/<%= u.UserId %>" class="d-inline">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="btn btn-sm btn-outline-info">Unlock</button>
+                </form>
+              <% } %>
+            <% } else { %>
+              <span class="text-muted small">Current User</span>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

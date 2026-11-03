@@ -1,0 +1,30 @@
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4"><i class="bi bi-building"></i> AcxiomCRM Login</h3>
+        <% if (error) { %>
+          <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        <form method="POST" action="/auth/login" id="loginForm">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required
+              data-validate="required,email" data-label="Email">
+            <div class="validation-error" id="email-error"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required
+              data-validate="required" data-label="Password">
+            <div class="validation-error" id="password-error"></div>
+          </div>
+          <button class="btn btn-primary w-100">Login</button>
+        </form>
+        <p class="text-center mt-3">Don't have an account? <a href="/auth/register">Register</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>document.addEventListener('DOMContentLoaded', function(){ validateForm('loginForm'); });</script>
